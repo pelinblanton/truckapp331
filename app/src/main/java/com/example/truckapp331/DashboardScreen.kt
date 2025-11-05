@@ -54,7 +54,7 @@ fun DashboardScreen(navController: NavController) {
 
         Button(
             onClick = {
-                // Navigate to route page later
+                // navigate to route page later
             },
             modifier = Modifier.fillMaxWidth(0.7f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
