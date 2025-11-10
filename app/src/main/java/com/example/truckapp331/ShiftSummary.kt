@@ -39,9 +39,9 @@ fun ShiftSummary(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("✔ Completed Deliveries: $completedCount")
                 Text("📦 Pending Deliveries: $pendingCount")
-                Text("⏱ Shift Time: --") // Placeholder
-                Text("🧭 Miles Traveled: --") // Placeholder
-                Text("❌ Issues Encountered: --") // Placeholder
+                Text("⏱ Shift Time: --")
+                Text("🧭 Miles Traveled: --")
+                Text("❌ Issues Encountered: --")
             }
         }
 
