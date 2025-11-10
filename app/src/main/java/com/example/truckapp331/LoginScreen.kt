@@ -84,11 +84,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = {
-                Toast.makeText(context, "Password reset not implemented", Toast.LENGTH_SHORT).show()
-            }) {
-                Text("Forgot my password…")
-            }
         }
     }
 }
