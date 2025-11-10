@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController // ✅ required
+import com.example.truckapp33.LoginScreen
 import com.example.truckapp331.ui.theme.Truckapp331Theme
 
 class MainActivity : ComponentActivity() {
@@ -14,10 +15,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             Truckapp331Theme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    val navController = rememberNavController()
-                    LoginScreen(navController = navController) // ✅ fixed
+                    MainScreen()
                 }
             }
         }
     }
 }
+

@@ -26,6 +26,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.identity.doctypes.jvm)
     // ✅ Define the Compose BOM first
     val composeBom = platform("androidx.compose:compose-bom:2024.05.00")
 
@@ -48,4 +49,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    //Google maps
+    //implementation("com.google.maps.android:maps-compose:2.11.4")
+    //implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
