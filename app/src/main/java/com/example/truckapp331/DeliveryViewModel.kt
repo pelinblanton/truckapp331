@@ -15,6 +15,14 @@ class DeliveryViewModel : ViewModel() {
         return allDeliveries.find { it.id == id }
     }
 
+    fun getCompletedDeliveries(): List<Delivery> {
+        return allDeliveries.filter { it.isCompleted }
+    }
+
+    fun getActiveDeliveries(): List<Delivery> {
+        return allDeliveries.filter { !it.isCompleted }
+    }
+
     fun markDeliveryAsCompleted(delivery: Delivery) {
         val index = allDeliveries.indexOfFirst { it.id == delivery.id }
         if (index != -1) {

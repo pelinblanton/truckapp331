@@ -33,6 +33,10 @@ fun MainScreen() {
                 CurrentDeliveryDetails(navController, deliveryId, deliveryViewModel)
             }
         }
+        composable("shiftSummary") {
+            ShiftSummary(navController, deliveryViewModel)
+        }
+
     }
 }
 

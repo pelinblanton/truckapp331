@@ -59,6 +59,13 @@ fun DeliveryListScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
+            onClick = { navController.navigate("shiftSummary") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("📋 View Shift Summary")
+        }
+
+        Button(
             onClick = {
                 navController.navigate("dashboard") {
                     popUpTo("deliveryList") { inclusive = true }
