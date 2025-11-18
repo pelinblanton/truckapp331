@@ -6,5 +6,6 @@ data class Delivery(
     val instructions: String,
     val quantity: Int,
     val time: String,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val startTime: Long? = null
 )

@@ -16,15 +16,18 @@ fun DeliveryListScreen(
     navController: NavController,
     deliveryViewModel: DeliveryViewModel = viewModel()
 ) {
+    var selectedDeliveryId by remember { mutableStateOf<Int?>(null) }
+    var showFirstDialog by remember { mutableStateOf(false) }
+    var showSecondDialog by remember { mutableStateOf(false) }
     var showCompleted by remember { mutableStateOf(false) }
 
-    // 💡 Auto-updates when `markDeliveryAsCompleted()` is called
     val deliveries = deliveryViewModel.allDeliveries.filter { it.isCompleted == showCompleted }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Text(
             text = if (showCompleted) "Past Deliveries" else "Deliveries to Complete",
             style = MaterialTheme.typography.headlineMedium
@@ -45,8 +48,14 @@ fun DeliveryListScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
+                    if (delivery.isCompleted) {
+
                         navController.navigate("deliveryDetails/${delivery.id}")
+                    } else {
+                        selectedDeliveryId = delivery.id
+                        showFirstDialog = true
                     }
+                }
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(delivery.name, fontWeight = FontWeight.Bold)
@@ -57,13 +66,6 @@ fun DeliveryListScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = { navController.navigate("shiftSummary") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("📋 View Shift Summary")
-        }
 
         Button(
             onClick = {
@@ -78,6 +80,58 @@ fun DeliveryListScreen(
             Text("← Back to Dashboard")
         }
     }
+
+    // First Dialog: Start or View
+    if (showFirstDialog && selectedDeliveryId != null) {
+        AlertDialog(
+            onDismissRequest = { showFirstDialog = false },
+            title = { Text("Start or View Delivery?") },
+            text = { Text("Would you like to start this delivery or just view its details?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showFirstDialog = false
+                        showSecondDialog = true // ➕ Trigger second confirmation
+                    }
+                ) {
+                    Text("Start Delivery")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate("deliveryDetails/$selectedDeliveryId")
+                        showFirstDialog = false
+                    }
+                ) {
+                    Text("View Only")
+                }
+            }
+        )
+    }
+
+    // Second Dialog: Confirm Start
+    if (showSecondDialog && selectedDeliveryId != null) {
+        AlertDialog(
+            onDismissRequest = { showSecondDialog = false },
+            title = { Text("Start Delivery?") },
+            text = { Text("Are you sure you want to start this delivery?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deliveryViewModel.startDelivery(selectedDeliveryId!!)
+                        navController.navigate("deliveryDetails/$selectedDeliveryId")
+                        showSecondDialog = false
+                    }
+                ) {
+                    Text("Yes, Start")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSecondDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
-
-

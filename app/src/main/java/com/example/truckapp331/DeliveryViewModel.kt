@@ -26,8 +26,14 @@ class DeliveryViewModel : ViewModel() {
     fun markDeliveryAsCompleted(delivery: Delivery) {
         val index = allDeliveries.indexOfFirst { it.id == delivery.id }
         if (index != -1) {
-            // ✅ Replace the item to trigger recomposition
             allDeliveries[index] = delivery.copy(isCompleted = true)
+        }
+    }
+    fun startDelivery(deliveryId: Int) {
+        val index = allDeliveries.indexOfFirst { it.id == deliveryId }
+        if (index != -1) {
+            val updated = allDeliveries[index].copy(startTime = System.currentTimeMillis())
+            allDeliveries[index] = updated
         }
     }
 }

@@ -37,11 +37,11 @@ fun ShiftSummary(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("✔ Completed Deliveries: $completedCount")
-                Text("📦 Pending Deliveries: $pendingCount")
-                Text("⏱ Shift Time: --")
-                Text("🧭 Miles Traveled: --")
-                Text("❌ Issues Encountered: --")
+                Text("Completed Deliveries: $completedCount")
+                Text("Pending Deliveries: $pendingCount")
+                Text("Shift Time: --")
+                Text("Miles Traveled: --")
+                Text("Issues Encountered: --")
             }
         }
 

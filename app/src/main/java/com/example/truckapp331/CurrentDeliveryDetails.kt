@@ -78,12 +78,14 @@ fun CurrentDeliveryDetails(
             Text("Go Back to Delivery List")
         }
 
-        Button(
-            onClick = { showConfirmation = true },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Mark as Complete")
+        if (!delivery.isCompleted) {
+            Button(
+                onClick = { showConfirmation = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Mark as Complete")
+            }
         }
     }
 
