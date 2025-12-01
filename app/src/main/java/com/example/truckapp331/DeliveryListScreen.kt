@@ -21,6 +21,9 @@ fun DeliveryListScreen(
     var showSecondDialog by remember { mutableStateOf(false) }
     var showCompleted by remember { mutableStateOf(false) }
 
+    var showNoneCompletedDialog by remember { mutableStateOf(false) }
+    var showIncompleteDialog by remember { mutableStateOf(false) }
+
     val deliveries = deliveryViewModel.allDeliveries.filter { it.isCompleted == showCompleted }
 
     Column(
@@ -48,14 +51,13 @@ fun DeliveryListScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
-                    if (delivery.isCompleted) {
-
-                        navController.navigate("deliveryDetails/${delivery.id}")
-                    } else {
-                        selectedDeliveryId = delivery.id
-                        showFirstDialog = true
+                        if (delivery.isCompleted) {
+                            navController.navigate("deliveryDetails/${delivery.id}")
+                        } else {
+                            selectedDeliveryId = delivery.id
+                            showFirstDialog = true
+                        }
                     }
-                }
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(delivery.name, fontWeight = FontWeight.Bold)
@@ -63,6 +65,25 @@ fun DeliveryListScreen(
                     Text("Time: ${delivery.time}")
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ✅ Shift Summary Button
+        Button(
+            onClick = {
+                val completed = deliveryViewModel.getCompletedCount()
+                val total = deliveryViewModel.getTotalCount()
+
+                when {
+                    completed == 0 -> showNoneCompletedDialog = true
+                    completed < total -> showIncompleteDialog = true
+                    else -> navController.navigate("shiftSummary")
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("📋 View Shift Summary")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -91,7 +112,7 @@ fun DeliveryListScreen(
                 TextButton(
                     onClick = {
                         showFirstDialog = false
-                        showSecondDialog = true // ➕ Trigger second confirmation
+                        showSecondDialog = true
                     }
                 ) {
                     Text("Start Delivery")
@@ -129,6 +150,42 @@ fun DeliveryListScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showSecondDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // None completed dialog
+    if (showNoneCompletedDialog) {
+        AlertDialog(
+            onDismissRequest = { showNoneCompletedDialog = false },
+            title = { Text("No Deliveries Completed") },
+            text = { Text("You haven't completed any deliveries.") },
+            confirmButton = {
+                TextButton(onClick = { showNoneCompletedDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    //Incomplete deliveries dialog
+    if (showIncompleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showIncompleteDialog = false },
+            title = { Text("Incomplete Deliveries") },
+            text = { Text("You have not completed all deliveries. Do you wish to continue?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showIncompleteDialog = false
+                    navController.navigate("shiftSummary")
+                }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showIncompleteDialog = false }) {
                     Text("Cancel")
                 }
             }

@@ -36,5 +36,12 @@ class DeliveryViewModel : ViewModel() {
             allDeliveries[index] = updated
         }
     }
+    fun getCompletedCount(): Int {
+        return allDeliveries.count { it.isCompleted }
+    }
+
+    fun getTotalCount(): Int {
+        return allDeliveries.size
+    }
 }
 
