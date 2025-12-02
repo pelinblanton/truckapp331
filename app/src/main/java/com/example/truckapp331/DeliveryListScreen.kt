@@ -69,7 +69,7 @@ fun DeliveryListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ Shift Summary Button
+        // Shift Summary Button
         Button(
             onClick = {
                 val completed = deliveryViewModel.getCompletedCount()
