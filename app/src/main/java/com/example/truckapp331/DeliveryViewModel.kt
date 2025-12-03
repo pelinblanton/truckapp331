@@ -29,13 +29,14 @@ class DeliveryViewModel : ViewModel() {
             allDeliveries[index] = delivery.copy(isCompleted = true)
         }
     }
-    fun startDelivery(deliveryId: Int) {
-        val index = allDeliveries.indexOfFirst { it.id == deliveryId }
+
+    fun startDelivery(id: Int) {
+        val index = allDeliveries.indexOfFirst { it.id == id }
         if (index != -1) {
-            val updated = allDeliveries[index].copy(startTime = System.currentTimeMillis())
-            allDeliveries[index] = updated
+            allDeliveries[index] = allDeliveries[index].copy(hasStarted = true)
         }
     }
+
     fun getCompletedCount(): Int {
         return allDeliveries.count { it.isCompleted }
     }
@@ -43,5 +44,6 @@ class DeliveryViewModel : ViewModel() {
     fun getTotalCount(): Int {
         return allDeliveries.size
     }
+
 }
 

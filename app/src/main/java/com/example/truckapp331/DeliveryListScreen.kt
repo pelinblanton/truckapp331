@@ -24,7 +24,12 @@ fun DeliveryListScreen(
     var showNoneCompletedDialog by remember { mutableStateOf(false) }
     var showIncompleteDialog by remember { mutableStateOf(false) }
 
-    val deliveries = deliveryViewModel.allDeliveries.filter { it.isCompleted == showCompleted }
+    val deliveries by remember(showCompleted, deliveryViewModel.allDeliveries) {
+        derivedStateOf {
+            deliveryViewModel.allDeliveries.filter { it.isCompleted == showCompleted }
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -51,13 +56,15 @@ fun DeliveryListScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
-                        if (delivery.isCompleted) {
+                        selectedDeliveryId = delivery.id
+
+                        if (delivery.isCompleted || delivery.hasStarted) {
                             navController.navigate("deliveryDetails/${delivery.id}")
                         } else {
-                            selectedDeliveryId = delivery.id
                             showFirstDialog = true
                         }
                     }
+
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(delivery.name, fontWeight = FontWeight.Bold)
@@ -121,7 +128,7 @@ fun DeliveryListScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        navController.navigate("deliveryDetails/$selectedDeliveryId")
+                        navController.navigate("deliveryDetails/$selectedDeliveryId?started=false")
                         showFirstDialog = false
                     }
                 ) {
@@ -141,7 +148,7 @@ fun DeliveryListScreen(
                 TextButton(
                     onClick = {
                         deliveryViewModel.startDelivery(selectedDeliveryId!!)
-                        navController.navigate("deliveryDetails/$selectedDeliveryId")
+                        navController.navigate("deliveryDetails/$selectedDeliveryId?started=true")
                         showSecondDialog = false
                     }
                 ) {

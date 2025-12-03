@@ -27,12 +27,30 @@ fun MainScreen() {
         composable("pastDeliveries") {
             PastDeliveries(navController, deliveryViewModel)
         }
-        composable("deliveryDetails/{deliveryId}") { backStackEntry ->
-            val deliveryId = backStackEntry.arguments?.getString("deliveryId")?.toIntOrNull()
+        composable(
+            route = "deliveryDetails/{deliveryId}?started={started}",
+            arguments = listOf(
+                navArgument("deliveryId") { type = NavType.IntType },
+                navArgument("started") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+            val deliveryId = backStackEntry.arguments?.getInt("deliveryId")
+            val started = backStackEntry.arguments?.getBoolean("started") ?: false
+
             if (deliveryId != null) {
-                CurrentDeliveryDetails(navController, deliveryId, deliveryViewModel)
+                CurrentDeliveryDetails(
+                    navController = navController,
+                    deliveryId = deliveryId,
+                    started = started,
+                    deliveryViewModel = deliveryViewModel
+                )
+
             }
         }
+
         composable("shiftSummary") {
             ShiftSummary(navController, deliveryViewModel)
         }

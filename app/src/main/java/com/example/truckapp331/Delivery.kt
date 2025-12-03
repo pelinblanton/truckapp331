@@ -7,5 +7,6 @@ data class Delivery(
     val quantity: Int,
     val time: String,
     val isCompleted: Boolean = false,
-    val startTime: Long? = null
+    val startTime: Long? = null,
+    val hasStarted: Boolean = false
 )

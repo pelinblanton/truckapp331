@@ -19,9 +19,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun CurrentDeliveryDetails(
     navController: NavController,
     deliveryId: Int,
+    started: Boolean,
     deliveryViewModel: DeliveryViewModel = viewModel()
 ) {
     val delivery = deliveryViewModel.getDeliveryById(deliveryId)
+
     var showConfirmation by remember { mutableStateOf(false) }
     var notes by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -78,7 +80,7 @@ fun CurrentDeliveryDetails(
             Text("Go Back to Delivery List")
         }
 
-        if (!delivery.isCompleted) {
+        if (started && !delivery.isCompleted) {
             Button(
                 onClick = { showConfirmation = true },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
