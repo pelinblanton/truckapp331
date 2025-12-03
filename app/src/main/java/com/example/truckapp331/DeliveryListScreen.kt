@@ -2,15 +2,21 @@ package com.example.truckapp331
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.truckapp331.model.Delivery
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveryListScreen(
     navController: NavController,
@@ -30,82 +36,151 @@ fun DeliveryListScreen(
         }
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = if (showCompleted) "Past Deliveries" else "Deliveries to Complete",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = { showCompleted = !showCompleted },
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = if (showCompleted) "Past Deliveries" else "Today’s Deliveries",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF0D47A1),
+                    titleContentColor = Color.White
+                )
+            )
+        },
+        containerColor = Color(0xFFF4F6FB)
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp)
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            Text(if (showCompleted) "View Pending Deliveries" else "View Past Deliveries")
-        }
 
-        deliveries.forEach { delivery ->
-            Card(
+            // Helper text + toggle chip
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .clickable {
-                        selectedDeliveryId = delivery.id
-
-                        if (delivery.isCompleted || delivery.hasStarted) {
-                            navController.navigate("deliveryDetails/${delivery.id}")
-                        } else {
-                            showFirstDialog = true
-                        }
-                    }
-
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(delivery.name, fontWeight = FontWeight.Bold)
-                    Text("Quantity: ${delivery.quantity}")
-                    Text("Time: ${delivery.time}")
+                Text(
+                    text = if (showCompleted)
+                        "Review your completed deliveries."
+                    else
+                        "Tap a delivery to start or view details.",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color(0xFF616161)
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+
+                AssistChip(
+                    onClick = { showCompleted = !showCompleted },
+                    label = {
+                        Text(
+                            text = if (showCompleted) "View Pending" else "View Past",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    shape = MaterialTheme.shapes.small
+                )
+            }
+
+            // Delivery list section
+            if (deliveries.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (showCompleted)
+                            "No past deliveries to show yet."
+                        else
+                            "No deliveries assigned right now.",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color(0xFF9E9E9E)
+                        )
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(deliveries) { delivery ->
+                        DeliveryListItemCard(
+                            delivery = delivery,
+                            onClick = {
+                                selectedDeliveryId = delivery.id
+
+                                if (delivery.isCompleted || delivery.hasStarted) {
+                                    navController.navigate("deliveryDetails/${delivery.id}?started=true")
+                                } else {
+                                    showFirstDialog = true
+                                }
+                            }
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Shift Summary Button
-        Button(
-            onClick = {
-                val completed = deliveryViewModel.getCompletedCount()
-                val total = deliveryViewModel.getTotalCount()
+            // Shift Summary Button (primary CTA)
+            Button(
+                onClick = {
+                    val completed = deliveryViewModel.getCompletedCount()
+                    val total = deliveryViewModel.getTotalCount()
 
-                when {
-                    completed == 0 -> showNoneCompletedDialog = true
-                    completed < total -> showIncompleteDialog = true
-                    else -> navController.navigate("shiftSummary")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("📋 View Shift Summary")
-        }
+                    when {
+                        completed == 0 -> showNoneCompletedDialog = true
+                        completed < total -> showIncompleteDialog = true
+                        else -> navController.navigate("shiftSummary")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFA000)
+                )
+            ) {
+                Text(
+                    text = "📋 View Shift Summary",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+            }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
-                navController.navigate("dashboard") {
-                    popUpTo("deliveryList") { inclusive = true }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-        ) {
-            Text("← Back to Dashboard")
+            // Back to dashboard (secondary)
+            OutlinedButton(
+                onClick = {
+                    navController.navigate("dashboard") {
+                        popUpTo("dashboard") { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("← Back to Dashboard")
+            }
         }
     }
 
@@ -113,7 +188,7 @@ fun DeliveryListScreen(
     if (showFirstDialog && selectedDeliveryId != null) {
         AlertDialog(
             onDismissRequest = { showFirstDialog = false },
-            title = { Text("Start or View Delivery?") },
+            title = { Text("Open Delivery") },
             text = { Text("Would you like to start this delivery or just view its details?") },
             confirmButton = {
                 TextButton(
@@ -177,7 +252,7 @@ fun DeliveryListScreen(
         )
     }
 
-    //Incomplete deliveries dialog
+    // Incomplete deliveries dialog
     if (showIncompleteDialog) {
         AlertDialog(
             onDismissRequest = { showIncompleteDialog = false },
@@ -197,5 +272,67 @@ fun DeliveryListScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun DeliveryListItemCard(
+    delivery: Delivery,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Text(
+                text = delivery.name,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Quantity: ${delivery.quantity}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Time: ${delivery.time}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            val statusLabel = when {
+                delivery.isCompleted -> "Completed"
+                delivery.hasStarted -> "In Progress"
+                else -> "Pending"
+            }
+
+            Text(
+                text = statusLabel,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    color = when {
+                        delivery.isCompleted -> Color(0xFF2E7D32) // green-ish
+                        delivery.hasStarted -> Color(0xFF0277BD) // blue-ish
+                        else -> Color(0xFF757575) // neutral
+                    }
+                )
+            )
+        }
     }
 }
